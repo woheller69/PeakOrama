@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=0"
+    />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="peakviewer.css" />
+
+    <script async type="text/javascript" src="https://www.peakfinder.org/script/peakfinder.1.0.min.js"></script>
+  </head> 
+
+  <body>
+    <div class="container">
+
+      <div class="content">
+        <canvas id="pfcanvas" oncontextmenu="event.preventDefault()"> </canvas>
+
+        <div id="pfcanvasprogress">
+          <div class="spinner" id="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
+
+      function commandscallback(cmd) {
+        console.log('command: ' + cmd)
+      }
+
+      window.onload = () => {
+
+        if (PeakFinder.utils.caniuse()) {
+
+          let panel = new PeakFinder.PanoramaPanel({
+            canvasid: 'pfcanvas', 
+            locale: 'en'
+          }) // attach to canvas
+         
+          panel.registerCommandsCallback(commandscallback)
+
+          panel.init(function() {
+            console.log('ready')
+            panel.settings.distanceUnit(getUrlParameter('units'))
+        
+            panel.loadViewpoint(getUrlParameter('lat'), getUrlParameter('lon'))
+
+            // animate to view
+            //panel.azimut(209.0, 2.0)
+            //panel.altitude(1.0, 1.0)
+            //panel.fieldofview(45.0, 2.0)
+          
+          });
+        }
+        else { // !caniuse
+        
+        }
+      }
+
+    </script>
+  </body>
+</html> 
