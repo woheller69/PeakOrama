@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -45,7 +47,7 @@ import java.util.ArrayList;
             super.onCreate(savedInstanceState);
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             setContentView(R.layout.activity_main);
-
+            if (getSupportActionBar()!=null) getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getColor(R.color.grey)));
             peakWebView = findViewById(R.id.peakViewer);
 
             //Set cookie options
@@ -170,6 +172,8 @@ import java.util.ArrayList;
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 }
 
+            } else if (item.getItemId()==R.id.menu_telescope){
+                peakWebView.loadUrl("javascript:showTelescope();");
             }
           return true;
         }
@@ -193,7 +197,8 @@ import java.util.ArrayList;
                         location.getLongitude(),
                         getNightMode()
                 );
-
+                findViewById(R.id.main_background).setVisibility(View.GONE);  //Remove background image
+                peakWebView.setVisibility(View.VISIBLE);
                 peakWebView.loadUrl(urlToLoad);
 
                 removeLocationListener();

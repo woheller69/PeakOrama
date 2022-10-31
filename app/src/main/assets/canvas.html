@@ -9,7 +9,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="peakviewer.css" />
 
-    <script async type="text/javascript" src="https://www.peakfinder.org/script/peakfinder.1.0.min.js"></script>
+    <script async type="text/javascript" src="peakfinder.1.0.min.js"></script>
+    <!-- <script async type="text/javascript" src="https://www.peakfinder.org/script/peakfinder.1.0.min.js"></script> -->
   </head> 
 
   <body>
@@ -50,15 +51,17 @@
         console.log('command: ' + cmd)
       }
 
+      let panel;
+
       window.onload = () => {
 
         if (PeakFinder.utils.caniuse()) {
 
-          let panel = new PeakFinder.PanoramaPanel({
+          panel = new PeakFinder.PanoramaPanel({
             canvasid: 'pfcanvas', 
             locale: 'en'
           }) // attach to canvas
-         
+
           panel.registerCommandsCallback(commandscallback)
 
           panel.init(function() {
@@ -78,6 +81,10 @@
         
         }
       }
+
+    function showTelescope(){
+       panel.telescope.show()
+    }
 
     </script>
   </body>
