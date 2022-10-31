@@ -64,9 +64,9 @@
           panel.init(function() {
             console.log('ready')
             panel.settings.distanceUnit(getUrlParameter('units'))
-        
             panel.loadViewpoint(getUrlParameter('lat'), getUrlParameter('lon'))
-
+            panel.telescope.show()
+            panel.settings.theme(getUrlParameter('night'))
             // animate to view
             //panel.azimut(209.0, 2.0)
             //panel.altitude(1.0, 1.0)

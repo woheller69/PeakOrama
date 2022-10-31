@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -45,8 +46,6 @@ import java.util.ArrayList;
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             setContentView(R.layout.activity_main);
 
-            String urlToLoad = "file:///android_asset/canvas.html?lat=46.53722&lon=8.12610&units=0";
-
             peakWebView = findViewById(R.id.peakViewer);
 
             //Set cookie options
@@ -65,7 +64,7 @@ import java.util.ArrayList;
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     boolean allowed = false;
                     for (String url : allowedDomains) {
-                        if (request.getUrl().getHost().equals(url)) {
+                        if (request.getUrl().getHost().endsWith(url)) {
                             //Log.d(getString(R.string.app_name), "Allowed access to " + request.getUrl().getHost());
                             allowed = true;
                         }
@@ -122,6 +121,7 @@ import java.util.ArrayList;
             //Allowed Domains
             allowedDomains.add("www.peakfinder.org");
             allowedDomains.add("service.peakfinder.org");
+            //allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
         }
 
     @Override
@@ -188,9 +188,10 @@ import java.util.ArrayList;
             public void onLocationChanged(android.location.Location location) {
 
                 String urlToLoad = String.format(
-                        "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0",
+                        "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0&night=%s",
                         location.getLatitude(),
-                        location.getLongitude()
+                        location.getLongitude(),
+                        getNightMode()
                 );
 
                 peakWebView.loadUrl(urlToLoad);
@@ -247,5 +248,8 @@ import java.util.ArrayList;
             }
         }
     }
-
+    private int getNightMode(){
+        int nightModeFlags =getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES ? 1 : 0 ;
+    }
 }
