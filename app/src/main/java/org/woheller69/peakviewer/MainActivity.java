@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -25,15 +26,14 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
-
+import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
 
 @SuppressLint("SetJavaScriptEnabled")
-    public class MainActivity extends AppCompatActivity {
+    public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
         private static LocationListener locationListenerGPS;
         private LocationManager locationManager;
         private static MenuItem updateLocationButton;
@@ -179,7 +179,18 @@ import java.util.ArrayList;
 
             } else if (item.getItemId()==R.id.menu_telescope){
                 peakWebView.loadUrl("javascript:showTelescope();");
-            }
+            }  else if (item.getItemId()==R.id.menu_search){
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        PhotonDialog photonDialog = new PhotonDialog();
+        photonDialog.setTitle("Search");
+        photonDialog.setNegativeButtonText("Cancel");
+        photonDialog.setPositiveButtonText("Select");
+        photonDialog.show(fragmentManager, "");
+        getSupportFragmentManager().executePendingTransactions();
+        photonDialog.getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+    }
           return true;
         }
 
@@ -261,5 +272,20 @@ import java.util.ArrayList;
     private int getNightMode(){
         int nightModeFlags =getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES ? 1 : 0 ;
+    }
+
+    @Override
+    public void onPhotonDialogResult(City city) {
+
+        String urlToLoad = String.format(
+                "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0&night=%s",
+                city.getLatitude(),
+                city.getLongitude(),
+                getNightMode()
+        );
+        findViewById(R.id.main_background).setVisibility(View.GONE);  //Remove background image
+        peakWebView.setVisibility(View.VISIBLE);
+        peakWebView.loadUrl(urlToLoad);
+
     }
 }

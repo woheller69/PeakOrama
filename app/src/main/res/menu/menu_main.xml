@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <item
+            android:id="@+id/menu_search"
+            android:icon="@drawable/ic_search_24dp"
+            app:showAsAction="always"
+            android:title="search" />
+        <item
             android:id="@+id/menu_update_location"
             android:icon="@drawable/ic_location_on_white_24dp"
             app:actionViewClass="android.widget.ImageButton"
