@@ -31,6 +31,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
+import org.woheller69.photondialog.City;
+import org.woheller69.photondialog.PhotonDialog;
 
 @SuppressLint("SetJavaScriptEnabled")
     public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
