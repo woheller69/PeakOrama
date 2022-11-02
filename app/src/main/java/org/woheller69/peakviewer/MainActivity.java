@@ -24,6 +24,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -160,16 +161,20 @@ import java.util.ArrayList;
             if (item.getItemId()==R.id.menu_update_location){
 
                 locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    if (locationListenerGPS == null) {
-                        Log.d("GPS", "Listener null");
-                        locationListenerGPS = getNewLocationListener();
-                        startUpdateLocatationAnimation();
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListenerGPS);
-                    }
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
                 } else {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        if (locationListenerGPS == null) {
+                            Log.d("GPS", "Listener null");
+                            locationListenerGPS = getNewLocationListener();
+                            startUpdateLocatationAnimation();
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListenerGPS);
+                        }
+                    } else {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    }
                 }
 
             } else if (item.getItemId()==R.id.menu_telescope){

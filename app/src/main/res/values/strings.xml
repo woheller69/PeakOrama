@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PeakViewer</string>
+    <string name="error_no_gps">Please turn on GPS</string>
 </resources>
