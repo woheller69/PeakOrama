@@ -29,6 +29,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    //implementation project(path: ':library')
 
-    implementation 'com.github.woheller69:PhotonDialog:-SNAPSHOT'
+    implementation 'com.github.woheller69:PhotonDialog:V1.0'
 }
