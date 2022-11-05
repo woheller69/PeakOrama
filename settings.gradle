@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "PeakViewer"
 include ':app'
+//include ':library'

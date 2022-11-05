@@ -22,7 +22,6 @@ import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
-import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -107,7 +106,7 @@ import org.woheller69.photondialog.PhotonDialog;
                 peakWebView.removeAllViews();
                 mapsWebSettings.setJavaScriptEnabled(false);
             }
-            //mapsWebView.clearCache(true);
+
             peakWebView.clearFormData();
             peakWebView.clearHistory();
             peakWebView.clearMatches();
@@ -115,7 +114,7 @@ import org.woheller69.photondialog.PhotonDialog;
             mapsCookieManager.removeSessionCookies(null);
             mapsCookieManager.removeAllCookies(null);
             mapsCookieManager.flush();
-            WebStorage.getInstance().deleteAllData();
+            //WebStorage.getInstance().deleteAllData();
             if (exit) {
                 peakWebView.destroy();
                 peakWebView = null;
@@ -188,6 +187,7 @@ import org.woheller69.photondialog.PhotonDialog;
         photonDialog.setTitle("Search");
         photonDialog.setNegativeButtonText("Cancel");
         photonDialog.setPositiveButtonText("Select");
+        photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
         photonDialog.show(fragmentManager, "");
         getSupportFragmentManager().executePendingTransactions();
         photonDialog.getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);

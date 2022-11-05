@@ -55,11 +55,18 @@
 
         if (PeakFinder.utils.caniuse()) {
 
-          panel = new PeakFinder.PanoramaPanel({
-            canvasid: 'pfcanvas', 
-            locale: 'en',
-            bgcolor: '0x454545'
-          }) // attach to canvas
+        if (getUrlParameter('night')==1){
+            panel = new PeakFinder.PanoramaPanel({
+              canvasid: 'pfcanvas',
+              locale: 'en',
+              bgcolor: '0x454545'
+            }) // attach to canvas
+          } else {
+              panel = new PeakFinder.PanoramaPanel({
+              canvasid: 'pfcanvas',
+              locale: 'en'
+            }) // attach to canvas
+          }
 
           panel.registerCommandsCallback(commandscallback)
 
