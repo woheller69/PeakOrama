@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <item
+            android:id="@+id/menu_compass"
+            android:icon="@drawable/ic_compass_off_24dp"
+            app:showAsAction="always"
+            android:title="compass" />
+        <item
             android:id="@+id/menu_search"
             android:icon="@drawable/ic_search_24dp"
             app:showAsAction="always"
