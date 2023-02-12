@@ -196,9 +196,9 @@ import org.woheller69.photondialog.PhotonDialog;
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         PhotonDialog photonDialog = new PhotonDialog();
-        photonDialog.setTitle("Search");
-        photonDialog.setNegativeButtonText("Cancel");
-        photonDialog.setPositiveButtonText("Select");
+        photonDialog.setTitle(getString(R.string.search));
+        photonDialog.setNegativeButtonText(getString(R.string.cancel));
+        photonDialog.setPositiveButtonText(getString(R.string.ok));
         photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
         photonDialog.show(fragmentManager, "");
         getSupportFragmentManager().executePendingTransactions();
@@ -214,7 +214,7 @@ import org.woheller69.photondialog.PhotonDialog;
                         startCompass();
                         item.setIcon(R.drawable.ic_compass_24dp);
                     } else
-                        Toast.makeText(this,"No Compass",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,getString(R.string.error_no_compass),Toast.LENGTH_LONG).show();
                 }
             }
           return true;
