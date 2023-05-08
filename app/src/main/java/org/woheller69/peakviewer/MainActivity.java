@@ -34,12 +34,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
+import org.woheller69.omgeodialog.City;
+import org.woheller69.omgeodialog.OmGeoDialog;
 import java.util.ArrayList;
-import org.woheller69.photondialog.City;
-import org.woheller69.photondialog.PhotonDialog;
 
 @SuppressLint("SetJavaScriptEnabled")
-    public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
+    public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeoDialogResult {
         private static LocationListener locationListenerGPS;
         private LocationManager locationManager;
         private static MenuItem updateLocationButton;
@@ -195,14 +195,14 @@ import org.woheller69.photondialog.PhotonDialog;
             }  else if (item.getItemId()==R.id.menu_search){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        PhotonDialog photonDialog = new PhotonDialog();
-        photonDialog.setTitle(getString(R.string.search));
-        photonDialog.setNegativeButtonText(getString(R.string.cancel));
-        photonDialog.setPositiveButtonText(getString(R.string.ok));
-        photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
-        photonDialog.show(fragmentManager, "");
+        OmGeoDialog omGeoDialog = new OmGeoDialog();
+        omGeoDialog.setTitle(getString(R.string.search));
+        omGeoDialog.setNegativeButtonText(getString(R.string.cancel));
+        omGeoDialog.setPositiveButtonText(getString(R.string.ok));
+        omGeoDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
+        omGeoDialog.show(fragmentManager, "");
         getSupportFragmentManager().executePendingTransactions();
-        photonDialog.getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        omGeoDialog.getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
     } else if (item.getItemId()==R.id.menu_compass){
                 if (sensorListener!=null){
@@ -372,7 +372,7 @@ import org.woheller69.photondialog.PhotonDialog;
     }
 
     @Override
-    public void onPhotonDialogResult(City city) {
+    public void onOmGeoDialogResult(City city) {
 
         String urlToLoad = String.format(
                 "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0&night=%s",
