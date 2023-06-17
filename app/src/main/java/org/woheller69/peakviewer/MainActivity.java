@@ -41,6 +41,7 @@ import java.util.ArrayList;
 @SuppressLint("SetJavaScriptEnabled")
     public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeoDialogResult {
         private static LocationListener locationListenerGPS;
+        private static LocationListener bearingListenerGPS;
         private LocationManager locationManager;
         private static MenuItem updateLocationButton;
         private WebView peakWebView = null;
@@ -103,12 +104,24 @@ import java.util.ArrayList;
         }
 
         @Override
-        protected void onDestroy() {
-            super.onDestroy();
-            resetWebView(true);
-            if (sensorManager != null) {
-                sensorManager.unregisterListener(sensorListener);
-            }
+        protected void onPause(){
+            if (bearingListenerGPS != null) removeBearingListener();
+            super.onPause();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            invalidateOptionsMenu();
+        }
+
+        @Override
+            protected void onDestroy() {
+                super.onDestroy();
+                resetWebView(true);
+                if (sensorManager != null) {
+                    sensorManager.unregisterListener(sensorListener);
+                }
         }
 
 
@@ -205,16 +218,36 @@ import java.util.ArrayList;
         omGeoDialog.getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
     } else if (item.getItemId()==R.id.menu_compass){
-                if (sensorListener!=null){
-                    sensorManager.unregisterListener(sensorListener);
-                    sensorListener=null;
+                if (sensorListener!=null || bearingListenerGPS!=null){
+                    if (sensorListener!=null) {
+                        sensorManager.unregisterListener(sensorListener);
+                        sensorListener=null;
+                    }
+                    if (bearingListenerGPS!=null) removeBearingListener();
                     item.setIcon(R.drawable.ic_compass_off_24dp);
                 } else {
                     if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null && sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
                         startCompass();
                         item.setIcon(R.drawable.ic_compass_24dp);
-                    } else
+                    } else {
+                        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                            Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                if (bearingListenerGPS == null) {
+                                    Log.d("GPS", "Listener null");
+                                    bearingListenerGPS = getNewBearingListener();
+                                    item.setIcon(R.drawable.ic_compass_24dp);
+                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, bearingListenerGPS);
+                                }
+                            } else {
+                                ActivityCompat.requestPermissions(this,
+                                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                            }
+                        }
                         Toast.makeText(this,getString(R.string.error_no_compass),Toast.LENGTH_LONG).show();
+                    }
                 }
             }
           return true;
@@ -291,6 +324,14 @@ import java.util.ArrayList;
             sensorManager.registerListener(sensorListener, magSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+    private void removeBearingListener() {
+        if (bearingListenerGPS!=null) {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            if (bearingListenerGPS!=null) locationManager.removeUpdates(bearingListenerGPS);
+        }
+        bearingListenerGPS=null;
+    }
+
     private void removeLocationListener() {
         if (locationListenerGPS!=null) {
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -298,6 +339,32 @@ import java.util.ArrayList;
         }
         locationListenerGPS=null;
     }
+
+    private LocationListener getNewBearingListener() {
+        return new LocationListener() {
+            @Override
+            public void onLocationChanged(android.location.Location location) {
+
+                if (peakWebView!=null && location.hasBearing() && location.getBearing() != 0) {
+                    peakWebView.loadUrl("javascript:setAzimut("+(location.getBearing()+360)%360+");");
+                }
+            }
+
+            @Deprecated
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
+    }
+
 
     private LocationListener getNewLocationListener() {
         return new LocationListener() {
