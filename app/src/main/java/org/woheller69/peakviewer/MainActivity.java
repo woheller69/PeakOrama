@@ -148,8 +148,8 @@ import java.util.ArrayList;
 
         private static void initURLs() {
             //Allowed Domains
-            allowedDomains.add("www.peakfinder.org");
-            allowedDomains.add("service.peakfinder.org");
+            allowedDomains.add("www.peakfinder.com");
+            allowedDomains.add("service.peakfinder.com");
             //allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
         }
 
@@ -215,7 +215,6 @@ import java.util.ArrayList;
         omGeoDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
         omGeoDialog.show(fragmentManager, "");
         getSupportFragmentManager().executePendingTransactions();
-        omGeoDialog.getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
     } else if (item.getItemId()==R.id.menu_compass){
                 if (sensorListener!=null || bearingListenerGPS!=null){
