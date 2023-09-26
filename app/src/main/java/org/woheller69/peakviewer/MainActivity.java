@@ -34,12 +34,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
-import org.woheller69.omgeodialog.City;
-import org.woheller69.omgeodialog.OmGeoDialog;
 import java.util.ArrayList;
+import org.woheller69.photondialog.City;
+import org.woheller69.photondialog.PhotonDialog;
 
 @SuppressLint("SetJavaScriptEnabled")
-    public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeoDialogResult {
+    public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
         private static LocationListener locationListenerGPS;
         private static LocationListener bearingListenerGPS;
         private LocationManager locationManager;
@@ -208,12 +208,12 @@ import java.util.ArrayList;
             }  else if (item.getItemId()==R.id.menu_search){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        OmGeoDialog omGeoDialog = new OmGeoDialog();
-        omGeoDialog.setTitle(getString(R.string.search));
-        omGeoDialog.setNegativeButtonText(getString(R.string.cancel));
-        omGeoDialog.setPositiveButtonText(getString(R.string.ok));
-        omGeoDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
-        omGeoDialog.show(fragmentManager, "");
+        PhotonDialog photonDialog = new PhotonDialog();
+        photonDialog.setTitle(getString(R.string.search));
+        photonDialog.setNegativeButtonText(getString(R.string.cancel));
+        photonDialog.setPositiveButtonText(getString(R.string.ok));
+        photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
+        photonDialog.show(fragmentManager, "");
         getSupportFragmentManager().executePendingTransactions();
 
     } else if (item.getItemId()==R.id.menu_compass){
@@ -438,7 +438,7 @@ import java.util.ArrayList;
     }
 
     @Override
-    public void onOmGeoDialogResult(City city) {
+    public void onPhotonDialogResult(City city) {
 
         String urlToLoad = String.format(
                 "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0&night=%s",
