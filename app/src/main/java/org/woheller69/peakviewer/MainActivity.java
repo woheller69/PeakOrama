@@ -12,14 +12,15 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -35,6 +36,11 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
+
+import org.woheller69.peakviewer.model.Azimuth;
+import org.woheller69.peakviewer.model.DisplayRotation;
+import org.woheller69.peakviewer.model.RotationVector;
+import org.woheller69.peakviewer.util.MathUtils;
 import org.woheller69.photondialog.City;
 import org.woheller69.photondialog.PhotonDialog;
 
@@ -49,7 +55,6 @@ import org.woheller69.photondialog.PhotonDialog;
         private CookieManager mapsCookieManager = null;
         private SensorManager sensorManager;
         private SensorEventListener sensorListener;
-        private double azimut = 0;
 
         private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
@@ -225,7 +230,7 @@ import org.woheller69.photondialog.PhotonDialog;
                     if (bearingListenerGPS!=null) removeBearingListener();
                     item.setIcon(R.drawable.ic_compass_off_24dp);
                 } else {
-                    if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null && sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+                    if (sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null) {
                         startCompass();
                         item.setIcon(R.drawable.ic_compass_24dp);
                     } else {
@@ -253,74 +258,20 @@ import org.woheller69.photondialog.PhotonDialog;
         }
 
     private void startCompass() {
-            Sensor accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            Sensor magSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            Sensor rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
             sensorListener = new SensorEventListener() {
-                float [] accValues = new float[3];
-                float [] magValues = new float[3];
+
                 public void onAccuracyChanged(Sensor sensor, int accuracy) {
                 }
 
                 public void onSensorChanged(SensorEvent event) {
-                    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                        accValues = event.values.clone();
-                    } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-                        magValues = event.values.clone();
-                    }
-                    float[] R = new float[9];
-                    float[] Rot = new float[9];
-                    float[] values = new float[3];
-
-                    //Fix orientation
-                    //https://stackoverflow.com/questions/18782829/android-sensormanager-strange-how-to-remapcoordinatesystem
-                    boolean success = SensorManager.getRotationMatrix(R,null,accValues,magValues);
-                    if (success) {
-                        int screenRotation = getWindowManager().getDefaultDisplay().getRotation();
-                        int axisX, axisY;
-                        boolean isUpSideDown = accValues[2] < 0;
-
-                        switch (screenRotation) {
-                            case Surface.ROTATION_0:
-                                axisX = (isUpSideDown ? SensorManager.AXIS_MINUS_X : SensorManager.AXIS_X);
-                                axisY = (Math.abs(accValues[1]) > 0.0f ?
-                                        (isUpSideDown ? SensorManager.AXIS_MINUS_Z : SensorManager.AXIS_Z) :
-                                        (isUpSideDown ? SensorManager.AXIS_MINUS_Y : SensorManager.AXIS_Y));
-                                break;
-                            case Surface.ROTATION_90:
-                                axisX = (isUpSideDown ? SensorManager.AXIS_MINUS_Y : SensorManager.AXIS_Y);
-                                axisY = (Math.abs(accValues[0]) > 0.0f ?
-                                        (isUpSideDown ? SensorManager.AXIS_Z : SensorManager.AXIS_MINUS_Z) :
-                                        (isUpSideDown ? SensorManager.AXIS_X : SensorManager.AXIS_MINUS_X));
-                                break;
-                            case  Surface.ROTATION_180:
-                                axisX = (isUpSideDown ? SensorManager.AXIS_X : SensorManager.AXIS_MINUS_X);
-                                axisY = (Math.abs(accValues[1]) > 0.0f ?
-                                        (isUpSideDown ? SensorManager.AXIS_Z : SensorManager.AXIS_MINUS_Z) :
-                                        (isUpSideDown ? SensorManager.AXIS_Y : SensorManager.AXIS_MINUS_Y));
-                                break;
-                            case Surface.ROTATION_270:
-                                axisX = (isUpSideDown ? SensorManager.AXIS_Y : SensorManager.AXIS_MINUS_Y);
-                                axisY = (Math.abs(accValues[0]) > 0.0f ?
-                                        (isUpSideDown ? SensorManager.AXIS_MINUS_Z : SensorManager.AXIS_Z) :
-                                        (isUpSideDown ? SensorManager.AXIS_MINUS_X : SensorManager.AXIS_X));
-                                break;
-                            default:
-                                axisX = (isUpSideDown ? SensorManager.AXIS_MINUS_X : SensorManager.AXIS_X);
-                                axisY = (isUpSideDown ? SensorManager.AXIS_MINUS_Y : SensorManager.AXIS_Y);
-                        }
-
-                        SensorManager.remapCoordinateSystem(R, axisX, axisY, Rot);
-                        SensorManager.getOrientation(Rot,values);
-
-                        double newAzimut = values[0];
-                        azimut=Math.atan2(15*Math.sin(azimut)+Math.sin(newAzimut),15*Math.cos(azimut)+Math.cos(newAzimut));
-                        peakWebView.loadUrl("javascript:setAzimut("+(Math.toDegrees(azimut)+360)%360+");");
+                    if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                        updateCompass(event);
                     }
                 }
             };
 
-            sensorManager.registerListener(sensorListener, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            sensorManager.registerListener(sensorListener, magSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(sensorListener, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void removeBearingListener() {
@@ -451,4 +402,38 @@ import org.woheller69.photondialog.PhotonDialog;
         peakWebView.loadUrl(urlToLoad);
 
     }
+
+    private void updateCompass(SensorEvent event) {
+        RotationVector rotationVector = new RotationVector(event.values[0], event.values[1], event.values[2]);
+        DisplayRotation displayRotation = getDisplayRotation();
+        // Calculate the magnetic azimuth using the RotationVector and display rotation
+        Azimuth magneticAzimuth = MathUtils.calculateAzimuth(rotationVector, displayRotation);
+
+        peakWebView.loadUrl("javascript:setAzimut("+(magneticAzimuth.getDegrees()+360)%360+");");
+
+    }
+
+    private DisplayRotation getDisplayRotation() {
+        Display display = getDisplayCompat();
+        switch (display.getRotation()) {
+            case Surface.ROTATION_90:
+                return DisplayRotation.ROTATION_90;
+            case Surface.ROTATION_180:
+                return DisplayRotation.ROTATION_180;
+            case Surface.ROTATION_270:
+                return DisplayRotation.ROTATION_270;
+            default:
+                return DisplayRotation.ROTATION_0;
+        }
+    }
+
+    private Display getDisplayCompat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return getDisplay();
+        } else {
+            //noinspection deprecation
+            return getWindowManager().getDefaultDisplay();
+        }
+    }
+
 }

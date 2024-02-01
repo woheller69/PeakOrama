@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'kotlin-android'
 }
 
 android {
@@ -9,8 +10,8 @@ android {
         applicationId "org.woheller69.peakviewer"
         minSdk 23
         targetSdk 33
-        versionCode 16
-        versionName "1.6"
+        versionCode 17
+        versionName "1.7"
     }
 
     buildTypes {
@@ -22,6 +23,7 @@ android {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.10"
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
