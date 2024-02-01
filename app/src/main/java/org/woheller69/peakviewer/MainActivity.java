@@ -111,6 +111,10 @@ import org.woheller69.photondialog.PhotonDialog;
         @Override
         protected void onPause(){
             if (bearingListenerGPS != null) removeBearingListener();
+            if (sensorManager != null){
+                sensorManager.unregisterListener(sensorListener);
+                sensorListener = null;
+            }
             super.onPause();
         }
 
@@ -124,9 +128,6 @@ import org.woheller69.photondialog.PhotonDialog;
             protected void onDestroy() {
                 super.onDestroy();
                 resetWebView(true);
-                if (sensorManager != null) {
-                    sensorManager.unregisterListener(sensorListener);
-                }
         }
 
 
