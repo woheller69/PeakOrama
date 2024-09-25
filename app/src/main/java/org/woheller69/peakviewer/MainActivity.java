@@ -36,6 +36,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.woheller69.peakviewer.model.Azimuth;
 import org.woheller69.peakviewer.model.DisplayRotation;
@@ -55,6 +56,7 @@ import org.woheller69.photondialog.PhotonDialog;
         private CookieManager mapsCookieManager = null;
         private SensorManager sensorManager;
         private SensorEventListener sensorListener;
+        private float azimuthDegrees = 0;
 
         private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
@@ -82,13 +84,23 @@ import org.woheller69.photondialog.PhotonDialog;
                 @Override
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     boolean allowed = false;
-                    for (String url : allowedDomains) {
-                        if (request.getUrl().getHost().endsWith(url)) {
-                            //Log.d(getString(R.string.app_name), "Allowed access to " + request.getUrl().getHost());
-                            allowed = true;
+                    for (String pattern : allowedDomains) {
+                        if (pattern.contains("*")) {
+                            if (Pattern.matches(pattern.replace("*", ".*"), request.getUrl().getHost())) {
+                                allowed = true;
+                                break;
+                            }
+                        } else {
+                            if (request.getUrl().getHost().equals(pattern)) {
+                                allowed = true;
+                                break;
+                            }
                         }
                     }
-                    if (allowed) return null;  //continue loading
+                    if (allowed) {
+                        //Log.d(getString(R.string.app_name), "Allowed access to " + request.getUrl().getHost());
+                        return null;  //continue loading
+                    }
                     else {
                         //Log.d(getString(R.string.app_name), "Blocked access to " + request.getUrl().getHost());
                         return new WebResourceResponse("text/javascript","UTF-8",null);  //replace with null content
@@ -154,7 +166,7 @@ import org.woheller69.photondialog.PhotonDialog;
 
         private static void initURLs() {
             //Allowed Domains
-            allowedDomains.add("peakfinder.com");
+            allowedDomains.add("cdn*.peakfinder.com");
             allowedDomains.add("www.peakfinder.com");
             allowedDomains.add("service.peakfinder.com");
             //allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
@@ -410,8 +422,13 @@ import org.woheller69.photondialog.PhotonDialog;
         DisplayRotation displayRotation = getDisplayRotation();
         // Calculate the magnetic azimuth using the RotationVector and display rotation
         Azimuth magneticAzimuth = MathUtils.calculateAzimuth(rotationVector, displayRotation);
-
-        peakWebView.loadUrl("javascript:setAzimut("+(magneticAzimuth.getDegrees()+360)%360+");");
+        float newAzimuthDegrees = (magneticAzimuth.getDegrees() + 360) % 360;
+        if (Math.abs(newAzimuthDegrees-azimuthDegrees) > 180){
+            if (newAzimuthDegrees > azimuthDegrees) azimuthDegrees += 360;
+            else newAzimuthDegrees += 360;
+        }
+        azimuthDegrees = ((9 * azimuthDegrees + newAzimuthDegrees) / 10 + 360) % 360;
+        peakWebView.loadUrl("javascript:setAzimut("+ azimuthDegrees +");");
 
     }
 
