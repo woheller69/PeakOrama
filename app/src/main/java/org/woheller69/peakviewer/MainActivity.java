@@ -91,7 +91,7 @@ import org.woheller69.photondialog.PhotonDialog;
                                 break;
                             }
                         } else {
-                            if (request.getUrl().getHost().equals(pattern)) {
+                            if (request.getUrl().getHost().endsWith(pattern)) {
                                 allowed = true;
                                 break;
                             }
@@ -99,6 +99,7 @@ import org.woheller69.photondialog.PhotonDialog;
                     }
                     if (allowed) {
                         //Log.d(getString(R.string.app_name), "Allowed access to " + request.getUrl().getHost());
+                        //Log.d(getString(R.string.app_name), "Load: " + request.getUrl());
                         return null;  //continue loading
                     }
                     else {
@@ -169,7 +170,7 @@ import org.woheller69.photondialog.PhotonDialog;
             allowedDomains.add("cdn*.peakfinder.com");
             allowedDomains.add("www.peakfinder.com");
             allowedDomains.add("service.peakfinder.com");
-            //allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
+            allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
         }
 
     @Override
