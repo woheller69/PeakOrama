@@ -1,1 +1,5 @@
 /build
+./idea/*
+*.apk
+app/debug/*
+app/release/*

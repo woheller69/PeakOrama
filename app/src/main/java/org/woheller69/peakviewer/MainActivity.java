@@ -57,11 +57,13 @@ import org.woheller69.photondialog.PhotonDialog;
         private SensorManager sensorManager;
         private SensorEventListener sensorListener;
         private float azimuthDegrees = 0;
+        private Context context;
 
         private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
+            context = this;
             super.onCreate(savedInstanceState);
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             setContentView(R.layout.activity_main);
@@ -81,6 +83,11 @@ import org.woheller69.photondialog.PhotonDialog;
             initURLs();
 
             peakWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                    return true;  //never load other urls
+                }
+
                 @Override
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     boolean allowed = false;
