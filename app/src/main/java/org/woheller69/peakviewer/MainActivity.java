@@ -3,6 +3,7 @@ package org.woheller69.peakviewer;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
@@ -12,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -350,6 +352,7 @@ import org.woheller69.photondialog.PhotonDialog;
                         getNightMode()
                 );
                 findViewById(R.id.main_background).setVisibility(View.GONE);  //Remove background image
+                findViewById(R.id.infoButton).setVisibility(View.GONE); //Remove info button
                 peakWebView.setVisibility(View.VISIBLE);
                 peakWebView.loadUrl(urlToLoad);
 
@@ -461,6 +464,9 @@ import org.woheller69.photondialog.PhotonDialog;
             //noinspection deprecation
             return getWindowManager().getDefaultDisplay();
         }
+    }
+    public void showGithub(View view) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/peakviewer")));
     }
 
 }

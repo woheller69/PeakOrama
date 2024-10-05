@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/ic_launcher_background"
     android:keepScreenOn="true">
+
+    <ImageButton
+        android:id="@+id/infoButton"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_gravity="start"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:background="@color/ic_launcher_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="showGithub"
+        android:src ="@drawable/ic_info_24px"
+        />
 
     <WebView
         android:id="@+id/peakViewer"
@@ -15,7 +31,6 @@
         android:id="@+id/main_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/ic_launcher_background"
         android:src="@drawable/ic_launcher_foreground"
         />
 
