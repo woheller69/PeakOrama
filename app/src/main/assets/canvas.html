@@ -74,7 +74,7 @@
             console.log('ready')
             panel.settings.distanceUnit(getUrlParameter('units'))
             panel.loadViewpoint(getUrlParameter('lat'), getUrlParameter('lon'))
-            panel.telescope.show()
+            panel.telescope.hide()
             panel.settings.theme(getUrlParameter('night'))
             // animate to view
             //panel.azimut(209.0, 2.0)
@@ -90,6 +90,10 @@
 
     function showTelescope(){
        panel.telescope.show()
+    }
+
+    function hideTelescope(){
+       panel.telescope.hide()
     }
 
     function setAzimut(azi){

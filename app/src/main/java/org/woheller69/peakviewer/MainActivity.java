@@ -59,13 +59,12 @@ import org.woheller69.photondialog.PhotonDialog;
         private SensorManager sensorManager;
         private SensorEventListener sensorListener;
         private float azimuthDegrees = 0;
-        private Context context;
+        private boolean showTelescope = false;
 
         private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
-            context = this;
             super.onCreate(savedInstanceState);
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             setContentView(R.layout.activity_main);
@@ -187,10 +186,19 @@ import org.woheller69.photondialog.PhotonDialog;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         final Menu m = menu;
+
+        if (peakWebView.getVisibility() == View.GONE) {
+            menu.findItem(R.id.menu_telescope).setVisible(false);
+            menu.findItem(R.id.menu_compass).setVisible(false);
+        }
+
+        if (showTelescope) menu.findItem(R.id.menu_telescope).setIcon(R.drawable.ic_telescope_24dp);
+        else menu.findItem(R.id.menu_telescope).setIcon(R.drawable.ic_telescope_off_24dp);
+
         updateLocationButton = menu.findItem(R.id.menu_update_location);
         updateLocationButton.setActionView(R.layout.menu_update_location_view);
         updateLocationButton.getActionView().setOnClickListener(v -> m.performIdentifierAction(updateLocationButton.getItemId(), 0));
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
 
             updateLocationButton.getActionView().clearAnimation();
             if (locationListenerGPS!=null) {  //GPS still trying to get new location -> stop and restart to get around problem with tablayout not updating
@@ -201,7 +209,7 @@ import org.woheller69.photondialog.PhotonDialog;
                         startUpdateLocatationAnimation();
                 }
             }
-        }else{
+        } else {
             removeLocationListener();
             if (updateLocationButton != null && updateLocationButton.getActionView() != null) {
                 updateLocationButton.getActionView().clearAnimation();
@@ -233,7 +241,10 @@ import org.woheller69.photondialog.PhotonDialog;
                 }
 
             } else if (item.getItemId()==R.id.menu_telescope){
-                peakWebView.loadUrl("javascript:showTelescope();");
+                showTelescope = !showTelescope;
+                if (showTelescope) peakWebView.loadUrl("javascript:showTelescope();");
+                else peakWebView.loadUrl("javascript:hideTelescope();");
+                invalidateOptionsMenu();
             }  else if (item.getItemId()==R.id.menu_search){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -354,6 +365,7 @@ import org.woheller69.photondialog.PhotonDialog;
                 findViewById(R.id.main_background).setVisibility(View.GONE);  //Remove background image
                 findViewById(R.id.infoButton).setVisibility(View.GONE); //Remove info button
                 peakWebView.setVisibility(View.VISIBLE);
+                invalidateOptionsMenu();
                 peakWebView.loadUrl(urlToLoad);
 
                 removeLocationListener();
@@ -423,7 +435,9 @@ import org.woheller69.photondialog.PhotonDialog;
                 getNightMode()
         );
         findViewById(R.id.main_background).setVisibility(View.GONE);  //Remove background image
+        findViewById(R.id.infoButton).setVisibility(View.GONE); //Remove info button
         peakWebView.setVisibility(View.VISIBLE);
+        invalidateOptionsMenu();
         peakWebView.loadUrl(urlToLoad);
 
     }

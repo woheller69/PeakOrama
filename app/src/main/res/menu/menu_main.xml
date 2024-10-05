@@ -8,6 +8,11 @@
             app:showAsAction="always"
             android:title="compass" />
         <item
+            android:id="@+id/menu_telescope"
+            android:icon="@drawable/ic_telescope_off_24dp"
+            app:showAsAction="always"
+            android:title="telescope" />
+        <item
             android:id="@+id/menu_search"
             android:icon="@drawable/ic_search_24dp"
             app:showAsAction="always"
@@ -18,11 +23,5 @@
             app:actionViewClass="android.widget.ImageButton"
             app:showAsAction="always"
             android:title="Location" />
-
-        <item
-            android:id="@+id/menu_telescope"
-            android:icon="@drawable/ic_telescope_24dp"
-            app:showAsAction="always"
-            android:title="telescope" />
 
 </menu>
