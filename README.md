@@ -4,7 +4,7 @@ woheller69@t-online.de
 
 # PeakOrama - show mountains around a location
 
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/01.png" width="150"/> 
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/01.png" width="300"/> 
 
 This app shows mountains around a location using the PeakFinder-API.
 Location can either be searched via the [photonAPI](https://github.com/komoot/photon) or via the GPS of your device.
