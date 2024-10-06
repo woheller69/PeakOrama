@@ -7,7 +7,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "org.woheller69.peakviewer"
+        applicationId "org.woheller69.PeakOrama"
         minSdk 23
         targetSdk 34
         versionCode 21

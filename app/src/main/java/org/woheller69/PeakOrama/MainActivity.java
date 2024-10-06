@@ -1,4 +1,4 @@
-package org.woheller69.peakviewer;
+package org.woheller69.PeakOrama;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -40,10 +40,10 @@ import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import org.woheller69.peakviewer.model.Azimuth;
-import org.woheller69.peakviewer.model.DisplayRotation;
-import org.woheller69.peakviewer.model.RotationVector;
-import org.woheller69.peakviewer.util.MathUtils;
+import org.woheller69.PeakOrama.model.Azimuth;
+import org.woheller69.PeakOrama.model.DisplayRotation;
+import org.woheller69.PeakOrama.model.RotationVector;
+import org.woheller69.PeakOrama.util.MathUtils;
 import org.woheller69.photondialog.City;
 import org.woheller69.photondialog.PhotonDialog;
 
@@ -69,7 +69,7 @@ import org.woheller69.photondialog.PhotonDialog;
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             setContentView(R.layout.activity_main);
             if (getSupportActionBar()!=null) getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getColor(R.color.grey)));
-            peakWebView = findViewById(R.id.peakViewer);
+            peakWebView = findViewById(R.id.peakWebView);
 
             //Set cookie options
             mapsCookieManager = CookieManager.getInstance();
@@ -480,7 +480,7 @@ import org.woheller69.photondialog.PhotonDialog;
         }
     }
     public void showGithub(View view) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/peakviewer")));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/peakOrama")));
     }
 
 }

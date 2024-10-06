@@ -1,6 +1,6 @@
 /*
  * This file is part of Compass.
- * Copyright (C) 2022 Philipp Bobek <philipp.bobek@mailbox.org>
+ * Copyright (C) 2023 Philipp Bobek <philipp.bobek@mailbox.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.woheller69.peakviewer.model
+package org.woheller69.PeakOrama.model
 
-enum class DisplayRotation {
-    ROTATION_0,
-    ROTATION_90,
-    ROTATION_180,
-    ROTATION_270
+enum class LocationStatus {
+    PRESENT,
+    NOT_PRESENT,
+    LOADING,
+    PERMISSION_DENIED
 }

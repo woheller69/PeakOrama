@@ -1,6 +1,6 @@
 /*
  * This file is part of Compass.
- * Copyright (C) 2021 Philipp Bobek <philipp.bobek@mailbox.org>
+ * Copyright (C) 2022 Philipp Bobek <philipp.bobek@mailbox.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.woheller69.peakviewer.model
+package org.woheller69.PeakOrama.model
 
-data class RotationVector(val x: Float, val y: Float, val z: Float) {
-
-    fun toArray(): FloatArray = floatArrayOf(x, y, z)
+enum class DisplayRotation {
+    ROTATION_0,
+    ROTATION_90,
+    ROTATION_180,
+    ROTATION_270
 }

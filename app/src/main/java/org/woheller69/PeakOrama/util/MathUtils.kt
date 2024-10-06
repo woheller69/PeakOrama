@@ -16,18 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.woheller69.peakviewer.util
+package org.woheller69.PeakOrama.util
 
 import android.hardware.GeomagneticField
 import android.hardware.SensorManager
 import android.location.Location
-import org.woheller69.peakviewer.model.Azimuth
-import org.woheller69.peakviewer.model.DisplayRotation
-import org.woheller69.peakviewer.model.DisplayRotation.ROTATION_0
-import org.woheller69.peakviewer.model.DisplayRotation.ROTATION_180
-import org.woheller69.peakviewer.model.DisplayRotation.ROTATION_270
-import org.woheller69.peakviewer.model.DisplayRotation.ROTATION_90
-import org.woheller69.peakviewer.model.RotationVector
+import org.woheller69.PeakOrama.model.Azimuth
+import org.woheller69.PeakOrama.model.DisplayRotation
+import org.woheller69.PeakOrama.model.DisplayRotation.ROTATION_0
+import org.woheller69.PeakOrama.model.DisplayRotation.ROTATION_180
+import org.woheller69.PeakOrama.model.DisplayRotation.ROTATION_270
+import org.woheller69.PeakOrama.model.DisplayRotation.ROTATION_90
+import org.woheller69.PeakOrama.model.RotationVector
 import kotlin.math.roundToInt
 
 private const val AZIMUTH = 0

@@ -2,11 +2,16 @@
 woheller69@t-online.de 
 <a href= "https://www.paypal.com/signin"><img  align="left" src="https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-150px.png"></a></pre>
 
-# peakOrama - show mountains around a location
+# PeakOrama - show mountains around a location
 
 This app shows mountains around a location using the PeakFinder-API.
 Location can either be searched via the [photonAPI](https://github.com/komoot/photon) or via the GPS of your device.
-The view can be rotated manually, or based on the built-in compass of your device or via direction of movement.
+The view can be rotated manually on the screen, or based on the built-in compass of your device or via direction of movement.
+
+A working internet connection is required to use this app. 
+Approximately 10-15MB of data is downloaded for each location, so be mindful of your data usage.
+For offline capability, consider using the official [PeakFinder app](https://www.peakfinder.com/mobile/).
+
 
 # License
 This work is licensed under GPLv3, © woheller69

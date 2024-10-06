@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.woheller69.peakviewer.model
+package org.woheller69.PeakOrama.model
 
 class Azimuth(_degrees: Float) {
 
