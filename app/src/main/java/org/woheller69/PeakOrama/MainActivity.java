@@ -59,7 +59,7 @@ import org.woheller69.photondialog.PhotonDialog;
         private SensorManager sensorManager;
         private SensorEventListener sensorListener;
         private float azimuthDegrees = 0;
-        private boolean showTelescope = false;
+        private long lastCompassUpdateTime = 0;
 
         private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
@@ -188,12 +188,8 @@ import org.woheller69.photondialog.PhotonDialog;
         final Menu m = menu;
 
         if (peakWebView.getVisibility() == View.GONE) {
-            menu.findItem(R.id.menu_telescope).setVisible(false);
             menu.findItem(R.id.menu_compass).setVisible(false);
         }
-
-        if (showTelescope) menu.findItem(R.id.menu_telescope).setIcon(R.drawable.ic_telescope_24dp);
-        else menu.findItem(R.id.menu_telescope).setIcon(R.drawable.ic_telescope_off_24dp);
 
         updateLocationButton = menu.findItem(R.id.menu_update_location);
         updateLocationButton.setActionView(R.layout.menu_update_location_view);
@@ -239,12 +235,6 @@ import org.woheller69.photondialog.PhotonDialog;
                                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                     }
                 }
-
-            } else if (item.getItemId()==R.id.menu_telescope){
-                showTelescope = !showTelescope;
-                if (showTelescope) peakWebView.loadUrl("javascript:showTelescope();");
-                else peakWebView.loadUrl("javascript:hideTelescope();");
-                invalidateOptionsMenu();
             }  else if (item.getItemId()==R.id.menu_search){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -443,6 +433,9 @@ import org.woheller69.photondialog.PhotonDialog;
     }
 
     private void updateCompass(SensorEvent event) {
+        long deltaT = (System.currentTimeMillis() - lastCompassUpdateTime);
+        lastCompassUpdateTime = System.currentTimeMillis();
+        float weight = Math.min(100, Math.max(0.1f, 1000L / deltaT));
         RotationVector rotationVector = new RotationVector(event.values[0], event.values[1], event.values[2]);
         DisplayRotation displayRotation = getDisplayRotation();
         // Calculate the magnetic azimuth using the RotationVector and display rotation
@@ -452,7 +445,7 @@ import org.woheller69.photondialog.PhotonDialog;
             if (newAzimuthDegrees > azimuthDegrees) azimuthDegrees += 360;
             else newAzimuthDegrees += 360;
         }
-        azimuthDegrees = ((9 * azimuthDegrees + newAzimuthDegrees) / 10 + 360) % 360;
+        azimuthDegrees = ((weight * azimuthDegrees + newAzimuthDegrees) / (1+weight) + 360) % 360;
         peakWebView.loadUrl("javascript:setAzimut("+ azimuthDegrees +");");
 
     }
