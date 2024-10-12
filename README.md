@@ -14,6 +14,9 @@ A working internet connection is required to use this app.
 Approximately 10-15MB of data is downloaded for each location, so be mindful of your data usage.
 For offline capability, consider using the official [PeakFinder app](https://www.peakfinder.com/mobile/).
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+alt="Get it on F-Droid"
+height="80">](https://f-droid.org/packages/org.woheller69.PeakOrama/)
 
 # License
 This work is licensed under GPLv3, © woheller69
