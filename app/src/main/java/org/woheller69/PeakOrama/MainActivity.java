@@ -434,8 +434,9 @@ import org.woheller69.photondialog.PhotonDialog;
 
     private void updateCompass(SensorEvent event) {
         long deltaT = (System.currentTimeMillis() - lastCompassUpdateTime);
+        if (deltaT < 10) return; // Ignore very short time intervals to prevent division by zero or large weights
         lastCompassUpdateTime = System.currentTimeMillis();
-        float weight = Math.min(100, Math.max(0.1f, 1000L / deltaT));
+        float weight = Math.min(100, Math.max(0.1f, (float) 1000L / deltaT));
         RotationVector rotationVector = new RotationVector(event.values[0], event.values[1], event.values[2]);
         DisplayRotation displayRotation = getDisplayRotation();
         // Calculate the magnetic azimuth using the RotationVector and display rotation
