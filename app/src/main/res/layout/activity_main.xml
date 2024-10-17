@@ -21,6 +21,18 @@
         android:src ="@drawable/ic_info_24px"
         />
 
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/compassOffsetSeekBar"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progressTint="#00ffffff"
+        android:background="@color/lightgrey"
+        android:thumbTint="@color/blue"
+        android:progressBackgroundTint="@color/blue"
+        android:paddingVertical="5dp"
+        android:min="-20"
+        android:max="20"/>
     <WebView
         android:id="@+id/peakWebView"
         android:visibility="gone"

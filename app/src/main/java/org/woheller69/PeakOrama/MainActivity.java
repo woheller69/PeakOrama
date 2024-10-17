@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
@@ -32,11 +33,14 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -48,154 +52,181 @@ import org.woheller69.photondialog.City;
 import org.woheller69.photondialog.PhotonDialog;
 
 @SuppressLint("SetJavaScriptEnabled")
-    public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
-        private static LocationListener locationListenerGPS;
-        private static LocationListener bearingListenerGPS;
-        private LocationManager locationManager;
-        private static MenuItem updateLocationButton;
-        private WebView peakWebView = null;
-        private WebSettings mapsWebSettings = null;
-        private CookieManager mapsCookieManager = null;
-        private SensorManager sensorManager;
-        private SensorEventListener sensorListener;
-        private float azimuthDegrees = 0;
-        private long lastCompassUpdateTime = 0;
+public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
+    private static LocationListener locationListenerGPS;
+    private static LocationListener bearingListenerGPS;
+    private LocationManager locationManager;
+    private static MenuItem updateLocationButton;
+    private WebView peakWebView = null;
+    private WebSettings mapsWebSettings = null;
+    private CookieManager mapsCookieManager = null;
+    private SensorManager sensorManager;
+    private SensorEventListener sensorListener;
+    private float azimuthDegrees = 0;
+    private float compassOffsetDegrees = 0;
+    private long lastCompassUpdateTime = 0;
+    private AppCompatSeekBar compassOffsetSeekBar = null;
+    private SharedPreferences sharedPreferences;
 
-        private static final ArrayList<String> allowedDomains = new ArrayList<>();
+    private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-            setContentView(R.layout.activity_main);
-            if (getSupportActionBar()!=null) getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getColor(R.color.grey)));
-            peakWebView = findViewById(R.id.peakWebView);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        setContentView(R.layout.activity_main);
+        if (getSupportActionBar()!=null) getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getColor(R.color.grey)));
 
-            //Set cookie options
-            mapsCookieManager = CookieManager.getInstance();
-            mapsCookieManager.setAcceptCookie(true);
-            mapsCookieManager.setAcceptThirdPartyCookies(peakWebView, false);
+        compassOffsetSeekBar = findViewById(R.id.compassOffsetSeekBar);
+        compassOffsetDegrees = sharedPreferences.getInt("compass_offset_degrees", 0);
+        compassOffsetSeekBar.setProgress((int) compassOffsetDegrees);
+        compassOffsetSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                compassOffsetDegrees = progress;
+                sharedPreferences.edit().putInt("compass_offset_degrees", progress).apply();
+            }
 
-            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            //Delete anything from previous sessions
-            resetWebView(false);
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
-            //Restrict what gets loaded
-            initURLs();
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
-            peakWebView.setWebViewClient(new WebViewClient() {
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                    return true;  //never load other urls
-                }
+        peakWebView = findViewById(R.id.peakWebView);
+        //Set cookie options
+        mapsCookieManager = CookieManager.getInstance();
+        mapsCookieManager.setAcceptCookie(true);
+        mapsCookieManager.setAcceptThirdPartyCookies(peakWebView, false);
 
-                @Override
-                public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                    boolean allowed = false;
-                    for (String pattern : allowedDomains) {
-                        if (pattern.contains("*")) {
-                            if (Pattern.matches(pattern.replace("*", ".*"), request.getUrl().getHost())) {
-                                allowed = true;
-                                break;
-                            }
-                        } else {
-                            if (request.getUrl().getHost().endsWith(pattern)) {
-                                allowed = true;
-                                break;
-                            }
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        //Delete anything from previous sessions
+        resetWebView(false);
+
+        //Restrict what gets loaded
+        initURLs();
+
+        peakWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return true;  //never load other urls
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                boolean allowed = false;
+                for (String pattern : allowedDomains) {
+                    if (pattern.contains("*")) {
+                        if (Pattern.matches(pattern.replace("*", ".*"), request.getUrl().getHost())) {
+                            allowed = true;
+                            break;
+                        }
+                    } else {
+                        if (request.getUrl().getHost().endsWith(pattern)) {
+                            allowed = true;
+                            break;
                         }
                     }
-                    if (allowed) {
-                        //Log.d(getString(R.string.app_name), "Allowed access to " + request.getUrl().getHost());
-                        //Log.d(getString(R.string.app_name), "Load: " + request.getUrl());
-                        return null;  //continue loading
-                    }
-                    else {
-                        //Log.d(getString(R.string.app_name), "Blocked access to " + request.getUrl().getHost());
-                        return new WebResourceResponse("text/javascript","UTF-8",null);  //replace with null content
-                    }
                 }
-
-            });
-
-            mapsWebSettings = peakWebView.getSettings();
-            mapsWebSettings.setDisplayZoomControls(true);
-            mapsWebSettings.setDomStorageEnabled(true);
-            mapsWebSettings.setJavaScriptEnabled(true);
-            mapsWebSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-            mapsWebSettings.setAllowContentAccess(false);
-            mapsWebSettings.setAllowFileAccess(false);
-            mapsWebSettings.setDatabaseEnabled(false);
-
-        }
-
-        @Override
-        protected void onPause(){
-            if (bearingListenerGPS != null) removeBearingListener();
-            if (sensorManager != null){
-                sensorManager.unregisterListener(sensorListener);
-                sensorListener = null;
-            }
-            super.onPause();
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            invalidateOptionsMenu();
-        }
-
-        @Override
-            protected void onDestroy() {
-                super.onDestroy();
-                resetWebView(true);
-        }
-
-
-        private void resetWebView(boolean exit) {
-            if (exit) {
-                peakWebView.loadUrl("about:blank");
-                peakWebView.removeAllViews();
-                mapsWebSettings.setJavaScriptEnabled(false);
+                if (allowed) {
+                    //Log.d(getString(R.string.app_name), "Allowed access to " + request.getUrl().getHost());
+                    //Log.d(getString(R.string.app_name), "Load: " + request.getUrl());
+                    return null;  //continue loading
+                }
+                else {
+                    //Log.d(getString(R.string.app_name), "Blocked access to " + request.getUrl().getHost());
+                    return new WebResourceResponse("text/javascript","UTF-8",null);  //replace with null content
+                }
             }
 
-            peakWebView.clearFormData();
-            peakWebView.clearHistory();
-            peakWebView.clearMatches();
-            peakWebView.clearSslPreferences();
-            mapsCookieManager.removeSessionCookies(null);
-            mapsCookieManager.removeAllCookies(null);
-            mapsCookieManager.flush();
-            //WebStorage.getInstance().deleteAllData();
-            if (exit) {
-                peakWebView.destroy();
-                peakWebView = null;
-            }
+        });
+
+        mapsWebSettings = peakWebView.getSettings();
+        mapsWebSettings.setDisplayZoomControls(true);
+        mapsWebSettings.setDomStorageEnabled(true);
+        mapsWebSettings.setJavaScriptEnabled(true);
+        mapsWebSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        mapsWebSettings.setAllowContentAccess(false);
+        mapsWebSettings.setAllowFileAccess(false);
+        mapsWebSettings.setDatabaseEnabled(false);
+
+    }
+
+    @Override
+    protected void onPause(){
+        if (bearingListenerGPS != null) removeBearingListener();
+        if (sensorManager != null){
+            sensorManager.unregisterListener(sensorListener);
+            sensorListener = null;
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        resetWebView(true);
+    }
+
+
+    private void resetWebView(boolean exit) {
+        if (exit) {
+            peakWebView.loadUrl("about:blank");
+            peakWebView.removeAllViews();
+            mapsWebSettings.setJavaScriptEnabled(false);
         }
 
-        private static void initURLs() {
-            //Allowed Domains
-            allowedDomains.add("cdn*.peakfinder.com");
-            allowedDomains.add("www.peakfinder.com");
-            allowedDomains.add("service.peakfinder.com");
-            allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
+        peakWebView.clearFormData();
+        peakWebView.clearHistory();
+        peakWebView.clearMatches();
+        peakWebView.clearSslPreferences();
+        mapsCookieManager.removeSessionCookies(null);
+        mapsCookieManager.removeAllCookies(null);
+        mapsCookieManager.flush();
+        //WebStorage.getInstance().deleteAllData();
+        if (exit) {
+            peakWebView.destroy();
+            peakWebView = null;
         }
+    }
+
+    private static void initURLs() {
+        //Allowed Domains
+        allowedDomains.add("cdn*.peakfinder.com");
+        allowedDomains.add("www.peakfinder.com");
+        allowedDomains.add("service.peakfinder.com");
+        allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        final Menu m = menu;
 
-        if (peakWebView.getVisibility() == View.GONE) {
-            menu.findItem(R.id.menu_compass).setVisible(false);
+        menu.findItem(R.id.menu_compass_calibrate).setChecked(compassOffsetSeekBar.getVisibility() != View.GONE);
+
+        if (peakWebView.getVisibility() == View.GONE) menu.findItem(R.id.menu_compass).setVisible(false);
+
+        if (sensorListener != null || bearingListenerGPS != null) menu.findItem(R.id.menu_compass).setIcon(R.drawable.ic_compass_24dp);
+        else menu.findItem(R.id.menu_compass).setIcon(R.drawable.ic_compass_off_24dp);
+
+        if (sensorListener == null) {
+            menu.findItem(R.id.menu_compass_calibrate).setVisible(false);
+            compassOffsetSeekBar.setVisibility(View.GONE);
         }
 
         updateLocationButton = menu.findItem(R.id.menu_update_location);
         updateLocationButton.setActionView(R.layout.menu_update_location_view);
-        updateLocationButton.getActionView().setOnClickListener(v -> m.performIdentifierAction(updateLocationButton.getItemId(), 0));
+        updateLocationButton.getActionView().setOnClickListener(v -> menu.performIdentifierAction(updateLocationButton.getItemId(), 0));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
-
             updateLocationButton.getActionView().clearAnimation();
             if (locationListenerGPS!=null) {  //GPS still trying to get new location -> stop and restart to get around problem with tablayout not updating
                 removeLocationListener();
@@ -215,79 +246,82 @@ import org.woheller69.photondialog.PhotonDialog;
         return true;
     }
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            if (item.getItemId()==R.id.menu_update_location){
-
-                locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                    Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId()==R.id.menu_update_location){
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
+            } else {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    if (locationListenerGPS == null) {
+                        Log.d("GPS", "Listener null");
+                        locationListenerGPS = getNewLocationListener();
+                        startUpdateLocatationAnimation();
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListenerGPS);
+                    }
                 } else {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        if (locationListenerGPS == null) {
-                            Log.d("GPS", "Listener null");
-                            locationListenerGPS = getNewLocationListener();
-                            startUpdateLocatationAnimation();
-                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListenerGPS);
-                        }
-                    } else {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                    }
-                }
-            }  else if (item.getItemId()==R.id.menu_search){
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        PhotonDialog photonDialog = new PhotonDialog();
-        photonDialog.setTitle(getString(R.string.search));
-        photonDialog.setNegativeButtonText(getString(R.string.cancel));
-        photonDialog.setPositiveButtonText(getString(R.string.ok));
-        photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
-        photonDialog.show(fragmentManager, "");
-        getSupportFragmentManager().executePendingTransactions();
-
-    } else if (item.getItemId()==R.id.menu_compass){
-                if (sensorListener!=null || bearingListenerGPS!=null){
-                    if (sensorListener!=null) {
-                        sensorManager.unregisterListener(sensorListener);
-                        sensorListener=null;
-                    }
-                    if (bearingListenerGPS!=null) removeBearingListener();
-                    item.setIcon(R.drawable.ic_compass_off_24dp);
-                } else {
-                    if (sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null) {
-                        startCompass();
-                        item.setIcon(R.drawable.ic_compass_24dp);
-                    } else {
-                        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                            Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
-                        } else {
-                            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                if (bearingListenerGPS == null) {
-                                    Log.d("GPS", "Listener null");
-                                    bearingListenerGPS = getNewBearingListener();
-                                    item.setIcon(R.drawable.ic_compass_24dp);
-                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, bearingListenerGPS);
-                                }
-                            } else {
-                                ActivityCompat.requestPermissions(this,
-                                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                            }
-                        }
-                        Toast.makeText(this,getString(R.string.error_no_compass),Toast.LENGTH_LONG).show();
-                    }
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 }
             }
-          return true;
+        }  else if (item.getItemId()==R.id.menu_search){
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            PhotonDialog photonDialog = new PhotonDialog();
+            photonDialog.setTitle(getString(R.string.search));
+            photonDialog.setNegativeButtonText(getString(R.string.cancel));
+            photonDialog.setPositiveButtonText(getString(R.string.ok));
+            photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
+            photonDialog.show(fragmentManager, "");
+            getSupportFragmentManager().executePendingTransactions();
+
+        } else if (item.getItemId()==R.id.menu_compass){
+            if (sensorListener!=null || bearingListenerGPS!=null){
+                if (sensorListener!=null) {
+                    sensorManager.unregisterListener(sensorListener);
+                    sensorListener=null;
+                }
+                if (bearingListenerGPS!=null) removeBearingListener();
+                item.setIcon(R.drawable.ic_compass_off_24dp);
+            } else {
+                if (sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null) {
+                    startCompass();
+                    item.setIcon(R.drawable.ic_compass_24dp);
+                } else {
+                    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                        Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
+                    } else {
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            if (bearingListenerGPS == null) {
+                                Log.d("GPS", "Listener null");
+                                bearingListenerGPS = getNewBearingListener();
+                                item.setIcon(R.drawable.ic_compass_24dp);
+                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, bearingListenerGPS);
+                            }
+                        } else {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                        }
+                    }
+                    Toast.makeText(this,getString(R.string.error_no_compass),Toast.LENGTH_LONG).show();
+                }
+            }
+            invalidateOptionsMenu();
+        } else if (item.getItemId()==R.id.menu_compass_calibrate) {
+            if (compassOffsetSeekBar.getVisibility() == View.GONE) compassOffsetSeekBar.setVisibility(View.VISIBLE);
+            else compassOffsetSeekBar.setVisibility(View.GONE);
+            invalidateOptionsMenu();
         }
+      return true;
+    }
 
     private void startCompass() {
             Sensor rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
             sensorListener = new SensorEventListener() {
 
-                public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                }
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
                 public void onSensorChanged(SensorEvent event) {
                     if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
@@ -327,16 +361,13 @@ import org.woheller69.photondialog.PhotonDialog;
 
             @Deprecated
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
 
             @Override
-            public void onProviderEnabled(String provider) {
-            }
+            public void onProviderEnabled(String provider) {}
 
             @Override
-            public void onProviderDisabled(String provider) {
-            }
+            public void onProviderDisabled(String provider) {}
         };
     }
 
@@ -366,16 +397,13 @@ import org.woheller69.photondialog.PhotonDialog;
 
             @Deprecated
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
 
             @Override
-            public void onProviderEnabled(String provider) {
-            }
+            public void onProviderEnabled(String provider) {}
 
             @Override
-            public void onProviderDisabled(String provider) {
-            }
+            public void onProviderDisabled(String provider) {}
         };
     }
 
@@ -447,7 +475,7 @@ import org.woheller69.photondialog.PhotonDialog;
             else newAzimuthDegrees += 360;
         }
         azimuthDegrees = ((weight * azimuthDegrees + newAzimuthDegrees) / (1+weight) + 360) % 360;
-        peakWebView.loadUrl("javascript:setAzimut("+ azimuthDegrees +");");
+        peakWebView.loadUrl("javascript:setAzimut("+ (azimuthDegrees + compassOffsetDegrees + 360) % 360 +");");
 
     }
 

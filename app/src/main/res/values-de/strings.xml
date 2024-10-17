@@ -5,4 +5,5 @@
     <string name="cancel">Abbrechen</string>
     <string name="ok">OK</string>
     <string name="search">Suche</string>
+    <string name="menu_adjust_compass_offset">Kompassabweichung einstellen</string>
 </resources>

@@ -5,4 +5,5 @@
     <string name="cancel">İptal</string>
     <string name="ok">Tamam</string>
     <string name="search">Ara</string>
+    <string name="menu_adjust_compass_offset">Pusula ofsetini ayarlayın</string>
 </resources>

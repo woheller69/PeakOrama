@@ -18,5 +18,10 @@
             app:actionViewClass="android.widget.ImageButton"
             app:showAsAction="always"
             android:title="Location" />
+        <item
+            android:id="@+id/menu_compass_calibrate"
+            android:checkable="true"
+            app:showAsAction="never"
+            android:title="@string/menu_adjust_compass_offset" />
 
 </menu>
