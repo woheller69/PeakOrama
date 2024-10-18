@@ -1,0 +1,2 @@
+Option to adjust compass offset
+Bugfix

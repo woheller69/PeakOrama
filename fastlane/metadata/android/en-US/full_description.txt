@@ -3,4 +3,4 @@ Location can either be searched via the Photon API or via the GPS of your device
 The view can be rotated manually on the screen, or based on the built-in compass of your device or via direction of movement.
 
 A working internet connection is required to use this app.
-Approximately 10-15MB of data is downloaded for each location, so be mindful of your data usage.
+Approximately 5-10 MB of data is downloaded for each location, so be mindful of your data usage.

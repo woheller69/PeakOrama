@@ -3,4 +3,4 @@ Der Standort kann entweder über die Photon-API oder über das GPS Ihres Geräts
 Die Ansicht kann manuell auf dem Bildschirm gedreht werden oder basierend auf dem eingebauten Kompass Ihres Geräts oder über die Bewegungsrichtung.
 
 Für die Nutzung dieser App ist eine funktionierende Internetverbindung erforderlich.
-Für jeden Standort werden etwa 10–15 MB Daten heruntergeladen. Achten Sie also auf Ihren Datenverbrauch.
+Für jeden Standort werden etwa 5-10 MB Daten heruntergeladen. Achten Sie also auf Ihren Datenverbrauch.
