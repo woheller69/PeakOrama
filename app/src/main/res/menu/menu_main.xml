@@ -24,4 +24,20 @@
             app:showAsAction="never"
             android:title="@string/menu_adjust_compass_offset" />
 
+        <group
+            android:id="@+id/menu_units_group"
+            android:checkableBehavior="single">
+                <item
+                    android:id="@+id/action_units_header"
+                    android:title="@string/units_menu_item"
+                    android:checkable="false">
+                </item>
+                <item
+                    android:id="@+id/menu_units_metric"
+                    android:title="@string/units_metric_menu_item" />
+                <item
+                    android:id="@+id/menu_units_imperial"
+                    android:title="@string/units_imperial_menu_item" />
+        </group>
+
 </menu>

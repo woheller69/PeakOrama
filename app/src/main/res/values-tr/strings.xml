@@ -6,4 +6,7 @@
     <string name="ok">Tamam</string>
     <string name="search">Ara</string>
     <string name="menu_adjust_compass_offset">Pusula ofsetini ayarlayın</string>
+    <string name="units_menu_item">Birimler</string>
+    <string name="units_metric_menu_item">Metrik</string>
+    <string name="units_imperial_menu_item">İngiliz</string>
 </resources>

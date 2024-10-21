@@ -39,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.MenuCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
@@ -210,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        MenuCompat.setGroupDividerEnabled(menu, true);
 
         menu.findItem(R.id.menu_compass_calibrate).setChecked(compassOffsetSeekBar.getVisibility() != View.GONE);
 
@@ -243,12 +245,18 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
             }
         }
 
+        int distanceUnit = sharedPreferences.getInt("distance_unit", 0);
+        if (distanceUnit == 0){
+            menu.findItem(R.id.menu_units_metric).setChecked(true);
+        } else if (distanceUnit == 1){
+            menu.findItem(R.id.menu_units_imperial).setChecked(true);
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId()==R.id.menu_update_location){
+        if (item.getItemId() == R.id.menu_update_location){
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
                 Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
@@ -265,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 }
             }
-        }  else if (item.getItemId()==R.id.menu_search){
+        }  else if (item.getItemId() == R.id.menu_search){
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             PhotonDialog photonDialog = new PhotonDialog();
@@ -276,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
             photonDialog.show(fragmentManager, "");
             getSupportFragmentManager().executePendingTransactions();
 
-        } else if (item.getItemId()==R.id.menu_compass){
+        } else if (item.getItemId() == R.id.menu_compass){
             if (sensorListener!=null || bearingListenerGPS!=null){
                 if (sensorListener!=null) {
                     sensorManager.unregisterListener(sensorListener);
@@ -309,9 +317,14 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
                 }
             }
             invalidateOptionsMenu();
-        } else if (item.getItemId()==R.id.menu_compass_calibrate) {
+        } else if (item.getItemId() == R.id.menu_compass_calibrate) {
             if (compassOffsetSeekBar.getVisibility() == View.GONE) compassOffsetSeekBar.setVisibility(View.VISIBLE);
             else compassOffsetSeekBar.setVisibility(View.GONE);
+            invalidateOptionsMenu();
+        } else if (item.getGroupId() == R.id.menu_units_group) {
+            if (item.getItemId() == R.id.menu_units_metric) sharedPreferences.edit().putInt("distance_unit", 0).apply();
+            else if (item.getItemId() == R.id.menu_units_imperial) sharedPreferences.edit().putInt("distance_unit", 1).apply();
+            peakWebView.loadUrl("javascript:setDistanceUnit("+sharedPreferences.getInt("distance_unit",0)+");");
             invalidateOptionsMenu();
         }
       return true;
@@ -378,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
             public void onLocationChanged(android.location.Location location) {
 
                 String urlToLoad = String.format(
-                        "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0&night=%s",
+                        "file:///android_asset/canvas.html?lat=%s&lon=%s&units="+sharedPreferences.getInt("distance_unit", 0) +"&night=%s",
                         location.getLatitude(),
                         location.getLongitude(),
                         getNightMode()
@@ -447,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
     public void onPhotonDialogResult(City city) {
 
         String urlToLoad = String.format(
-                "file:///android_asset/canvas.html?lat=%s&lon=%s&units=0&night=%s",
+                "file:///android_asset/canvas.html?lat=%s&lon=%s&units="+sharedPreferences.getInt("distance_unit", 0) +"&night=%s",
                 city.getLatitude(),
                 city.getLongitude(),
                 getNightMode()
