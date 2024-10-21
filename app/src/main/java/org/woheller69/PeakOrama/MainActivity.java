@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
     private static void initURLs() {
         //Allowed Domains
         allowedDomains.add("cdn*.peakfinder.com");
+        allowedDomains.add("cloud*.peakfinder.com");
         allowedDomains.add("www.peakfinder.com");
         allowedDomains.add("service.peakfinder.com");
         allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
