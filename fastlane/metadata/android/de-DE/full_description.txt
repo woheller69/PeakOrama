@@ -1,6 +1,8 @@
 PeakOrama zeigt die Berggipfel rund um einen Standort mithilfe der PeakFinder-API.
 Der Standort kann entweder über die Photon-API oder über das GPS Ihres Geräts gesucht werden.
 Die Ansicht kann manuell auf dem Bildschirm gedreht werden oder basierend auf dem eingebauten Kompass Ihres Geräts oder über die Bewegungsrichtung.
+Falls Ihr Kompass auch nach der Kalibrierung eine Abweichung aufweist, besteht die Möglichkeit, die Abweichung zu korrigieren.
+Das Setzen von Markierungen wird nicht unterstützt.
 
 Für die Nutzung dieser App ist eine funktionierende Internetverbindung erforderlich.
 Für jeden Standort werden etwa 5-10 MB Daten heruntergeladen. Achten Sie also auf Ihren Datenverbrauch.

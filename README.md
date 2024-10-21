@@ -10,6 +10,7 @@ This app shows mountains around a location using the PeakFinder-API.
 Location can either be searched via the [photonAPI](https://github.com/komoot/photon) or via the GPS of your device.
 The view can be rotated manually on the screen, or based on the built-in compass of your device or via direction of movement.
 In case your compass has an offset even after calibration there is an option to adjust the offset.
+Setting marks is not supported.
 
 A working internet connection is required to use this app. 
 Approximately 5-10 MB of data is downloaded for each location, so be mindful of your data usage.
