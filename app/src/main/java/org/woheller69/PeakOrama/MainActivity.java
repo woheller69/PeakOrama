@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         mapsWebSettings.setAllowContentAccess(false);
         mapsWebSettings.setAllowFileAccess(false);
         mapsWebSettings.setDatabaseEnabled(false);
-
+        if (GithubStar.shouldShowStarDialog(this)) GithubStar.starDialog(this,"https://github.com/woheller69/PeakOrama");
     }
 
     @Override
@@ -516,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         }
     }
     public void showGithub(View view) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/peakOrama")));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/PeakOrama")));
     }
 
 }

@@ -9,4 +9,8 @@
     <string name="units_menu_item">Birimler</string>
     <string name="units_metric_menu_item">Metrik</string>
     <string name="units_imperial_menu_item">İngiliz</string>
+    <string name="dialog_OK_button">TAMAM</string>
+    <string name="dialog_NO_button">Hayır</string>
+    <string name="dialog_Later_button">Belki sonra</string>
+    <string name="dialog_StarOnGitHub">Bu uygulamayı beğendiniz mi? Lütfen GitHub\'da bir yıldız verin veya geliştiriciye PayPal ile bir kahve ısmarlayın.</string>
 </resources>

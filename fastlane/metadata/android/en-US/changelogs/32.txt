@@ -1,0 +1,2 @@
+Setting for imperial/metric
+Bugfix for sunrise/sunset times
