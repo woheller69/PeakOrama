@@ -19,6 +19,10 @@
             app:showAsAction="always"
             android:title="Location" />
         <item
+            android:id="@+id/menu_camera"
+            app:showAsAction="never"
+            android:title="Camera on" />
+        <item
             android:id="@+id/menu_compass_calibrate"
             android:checkable="true"
             app:showAsAction="never"

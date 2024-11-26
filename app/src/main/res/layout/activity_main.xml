@@ -33,11 +33,23 @@
         android:paddingVertical="5dp"
         android:min="-20"
         android:max="20"/>
-    <WebView
-        android:id="@+id/peakWebView"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <SurfaceView
+            android:id="@+id/surface_view"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <WebView
+            android:id="@+id/peakWebView"
+            android:alpha="0.7"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
 
     <ImageView
         android:id="@+id/main_background"

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -68,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
     private long lastCompassUpdateTime = 0;
     private AppCompatSeekBar compassOffsetSeekBar = null;
     private SharedPreferences sharedPreferences;
+    private Camera camera;
+    private SurfaceView surfaceView;
+    private SurfaceHolder surfaceHolder;
 
     private static final ArrayList<String> allowedDomains = new ArrayList<>();
 
@@ -152,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         mapsWebSettings.setAllowContentAccess(false);
         mapsWebSettings.setAllowFileAccess(false);
         mapsWebSettings.setDatabaseEnabled(false);
+        surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         if (GithubStar.shouldShowStarDialog(this)) GithubStar.starDialog(this,"https://github.com/woheller69/PeakOrama");
     }
 
@@ -161,6 +168,12 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         if (sensorManager != null){
             sensorManager.unregisterListener(sensorListener);
             sensorListener = null;
+        }
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+            surfaceView.setVisibility(View.INVISIBLE);
         }
         super.onPause();
     }
@@ -257,10 +270,10 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_update_location){
+        if (item.getItemId() == R.id.menu_update_location) {
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                Toast.makeText(this,R.string.error_no_gps,Toast.LENGTH_LONG).show();
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Toast.makeText(this, R.string.error_no_gps, Toast.LENGTH_LONG).show();
             } else {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     if (locationListenerGPS == null) {
@@ -274,18 +287,44 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 }
             }
-        }  else if (item.getItemId() == R.id.menu_search){
+        } else if (item.getItemId() == R.id.menu_search) {
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             PhotonDialog photonDialog = new PhotonDialog();
             photonDialog.setTitle(getString(R.string.search));
             photonDialog.setNegativeButtonText(getString(R.string.cancel));
             photonDialog.setPositiveButtonText(getString(R.string.ok));
-            photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
+            photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID + "/" + BuildConfig.VERSION_NAME);
             photonDialog.show(fragmentManager, "");
             getSupportFragmentManager().executePendingTransactions();
 
-        } else if (item.getItemId() == R.id.menu_compass){
+        } else if (item.getItemId() == R.id.menu_camera){
+            surfaceView.setVisibility(View.VISIBLE);
+            surfaceHolder = surfaceView.getHolder();
+            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+            surfaceHolder.addCallback(new SurfaceHolder.Callback() {
+                @Override
+                public void surfaceCreated(SurfaceHolder holder) {
+                    try {
+                        camera = Camera.open();
+                        camera.setDisplayOrientation(90);
+                        camera.setPreviewDisplay(holder);
+                        camera.startPreview();
+                        peakWebView.loadUrl("javascript:setFieldOfView("+camera.getParameters().getVerticalViewAngle()+");");
+                    } catch (Exception e) {
+                        Log.e("CameraPreview", "Error setting up camera preview", e);
+                    }
+                }
+
+                @Override
+                public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+
+                @Override
+                public void surfaceDestroyed(SurfaceHolder holder) {}
+            });
+
+        }else if (item.getItemId() == R.id.menu_compass){
             if (sensorListener!=null || bearingListenerGPS!=null){
                 if (sensorListener!=null) {
                     sensorManager.unregisterListener(sensorListener);
@@ -471,6 +510,12 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         peakWebView.setVisibility(View.VISIBLE);
         invalidateOptionsMenu();
         peakWebView.loadUrl(urlToLoad);
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+            surfaceView.setVisibility(View.INVISIBLE);
+        }
 
     }
 
