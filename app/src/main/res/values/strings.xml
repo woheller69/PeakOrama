@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PeakOrama</string>
+    <string name="app_name" translatable="false">PeakOrama</string>
     <string name="error_no_gps">Please turn on GPS</string>
     <string name="error_no_compass">No compass available. Using direction of movement.</string>
     <string name="cancel">Cancel</string>

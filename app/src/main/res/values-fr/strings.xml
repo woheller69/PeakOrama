@@ -1,0 +1,15 @@
+<resources>
+    <string name="error_no_gps">Veuillez activer le GPS</string>
+    <string name="error_no_compass">Pas de boussole disponible. Utilisation de la direction du mouvement.</string>
+    <string name="cancel">Annuler</string>
+    <string name="ok">OK</string>
+    <string name="search">Rechercher</string>
+    <string name="menu_adjust_compass_offset">Ajuster le décalage de la boussole</string>
+    <string name="units_menu_item">Unités</string>
+    <string name="units_metric_menu_item">Métrique</string>
+    <string name="units_imperial_menu_item">Impériales</string>
+    <string name="dialog_OK_button">OK</string>
+    <string name="dialog_NO_button">Non</string>
+    <string name="dialog_Later_button">Peut-être plus tard</string>
+    <string name="dialog_StarOnGitHub">Aimez-vous cette application ? Veuillez mettre une étoile sur GitHub ou offrir un café au développeur via PayPal.</string>
+</resources>

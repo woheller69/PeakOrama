@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">PeakOrama</string>
     <string name="error_no_gps">Lütfen GPS\'i açın</string>
     <string name="error_no_compass">Pusula kullanılabilir değil. Hareket yönü kullanılıyor.</string>
     <string name="cancel">İptal</string>
