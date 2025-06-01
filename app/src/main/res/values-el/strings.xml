@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">PeakOrama</string>
     <string name="error_no_gps">Παρακαλώ ενεργοποιήστε το GPS</string>
     <string name="error_no_compass">Η πυξίδα δεν είναι διαθέσιμη. Χρήση της κατεύθυνσης μετακίνησης.</string>
     <string name="cancel">Άκυρο</string>
