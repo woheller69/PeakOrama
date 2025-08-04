@@ -49,11 +49,12 @@ import org.woheller69.PeakOrama.model.Azimuth;
 import org.woheller69.PeakOrama.model.DisplayRotation;
 import org.woheller69.PeakOrama.model.RotationVector;
 import org.woheller69.PeakOrama.util.MathUtils;
-import org.woheller69.photondialog.City;
-import org.woheller69.photondialog.PhotonDialog;
+import org.woheller69.PeakOrama.util.ThemeUtil;
+import org.woheller69.omgeodialog.City;
+import org.woheller69.omgeodialog.OmGeoDialog;
 
 @SuppressLint("SetJavaScriptEnabled")
-public class MainActivity extends AppCompatActivity implements PhotonDialog.PhotonDialogResult {
+public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeoDialogResult {
     private static LocationListener locationListenerGPS;
     private static LocationListener bearingListenerGPS;
     private LocationManager locationManager;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         setContentView(R.layout.activity_main);
+        ThemeUtil.setStatusBarAppearance(this);
         if (getSupportActionBar()!=null) getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getColor(R.color.grey)));
 
         compassOffsetSeekBar = findViewById(R.id.compassOffsetSeekBar);
@@ -277,12 +279,12 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
         }  else if (item.getItemId() == R.id.menu_search){
 
             FragmentManager fragmentManager = getSupportFragmentManager();
-            PhotonDialog photonDialog = new PhotonDialog();
-            photonDialog.setTitle(getString(R.string.search));
-            photonDialog.setNegativeButtonText(getString(R.string.cancel));
-            photonDialog.setPositiveButtonText(getString(R.string.ok));
-            photonDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
-            photonDialog.show(fragmentManager, "");
+            OmGeoDialog omGeoDialog = new OmGeoDialog();
+            omGeoDialog.setTitle(getString(R.string.search));
+            omGeoDialog.setNegativeButtonText(getString(R.string.cancel));
+            omGeoDialog.setPositiveButtonText(getString(R.string.ok));
+            omGeoDialog.setUserAgentString(BuildConfig.APPLICATION_ID+"/"+BuildConfig.VERSION_NAME);
+            omGeoDialog.show(fragmentManager, "");
             getSupportFragmentManager().executePendingTransactions();
 
         } else if (item.getItemId() == R.id.menu_compass){
@@ -458,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements PhotonDialog.Phot
     }
 
     @Override
-    public void onPhotonDialogResult(City city) {
+    public void onOmGeoDialogResult(City city) {
 
         String urlToLoad = String.format(
                 "file:///android_asset/canvas.html?lat=%s&lon=%s&units="+sharedPreferences.getInt("distance_unit", 0) +"&night=%s",

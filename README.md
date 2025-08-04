@@ -11,7 +11,7 @@ Or via this link (with fees)
 <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/01.png" width="300"/> 
 
 This app shows mountains around a location using the PeakFinder-API.
-Location can either be searched via the [photonAPI](https://github.com/komoot/photon) or via the GPS of your device.
+Location can either be searched via the [Open-Meteo](https://open-meteo.com/) or via the GPS of your device.
 The view can be rotated manually on the screen, or based on the built-in compass of your device or via direction of movement.
 In case your compass has an offset even after calibration there is an option to adjust the offset.
 Setting marks is not supported.
@@ -29,7 +29,7 @@ This work is licensed under GPLv3, © woheller69
 
 - This app is built on the [PeakFinder-API](https://github.com/Fabiz/PeakFinder-API), published under MIT license
 - It uses code from [Compass](https://github.com/Kr0oked/Compass), published under GPLv3 license
-- It uses the [PhotonDialog](https://github.com/woheller69/PhotonDialog) library, published under GPLv3 license
+- Search-as-you-type location search is provided by [Open-Meteo](https://open-meteo.com/), under <a href='http://creativecommons.org/licenses/by/4.0/'>Attribution 4.0 International (CC BY 4.0)</a>
 
 # OTHER APPS
 

@@ -4,14 +4,15 @@ plugins {
 }
 
 android {
-    compileSdk 34
-
+    compileSdk 35
+    namespace 'org.woheller69.PeakOrama'
+    android.buildFeatures.buildConfig true
     defaultConfig {
         applicationId "org.woheller69.PeakOrama"
         minSdk 26
-        targetSdk 34
-        versionCode 33
-        versionName "3.3"
+        targetSdk 35
+        versionCode 34
+        versionName "3.4"
     }
 
     buildTypes {
@@ -24,11 +25,11 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.10"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.7.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.preference:preference:1.2.1'
     //implementation project(path: ':library')
 
-    implementation 'com.github.woheller69:PhotonDialog:V1.6'
+    implementation 'com.github.woheller69:OmGeoDialog:V1.5'
 }
