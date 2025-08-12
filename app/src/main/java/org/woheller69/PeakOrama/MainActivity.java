@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
         mapsWebSettings.setAllowFileAccess(false);
         mapsWebSettings.setDatabaseEnabled(false);
         if (GithubStar.shouldShowStarDialog(this)) GithubStar.starDialog(this,"https://github.com/woheller69/PeakOrama");
+        handleIntent(getIntent());
     }
 
     @Override
@@ -392,18 +393,10 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
         return new LocationListener() {
             @Override
             public void onLocationChanged(android.location.Location location) {
-
-                String urlToLoad = String.format(
-                        "file:///android_asset/canvas.html?lat=%s&lon=%s&units="+sharedPreferences.getInt("distance_unit", 0) +"&night=%s",
-                        location.getLatitude(),
-                        location.getLongitude(),
-                        getNightMode()
-                );
-                findViewById(R.id.main_background).setVisibility(View.GONE);  //Remove background image
-                findViewById(R.id.infoButton).setVisibility(View.GONE); //Remove info button
-                peakWebView.setVisibility(View.VISIBLE);
-                invalidateOptionsMenu();
-                peakWebView.loadUrl(urlToLoad);
+                City city = new City();
+                city.setLatitude((float) location.getLatitude());
+                city.setLongitude((float) location.getLongitude());
+                loadLocation(city);
 
                 removeLocationListener();
                 if (updateLocationButton != null && updateLocationButton.getActionView() != null) {
@@ -459,9 +452,7 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES ? 1 : 0 ;
     }
 
-    @Override
-    public void onOmGeoDialogResult(City city) {
-
+    private void loadLocation(City city) {
         String urlToLoad = String.format(
                 "file:///android_asset/canvas.html?lat=%s&lon=%s&units="+sharedPreferences.getInt("distance_unit", 0) +"&night=%s",
                 city.getLatitude(),
@@ -473,7 +464,11 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
         peakWebView.setVisibility(View.VISIBLE);
         invalidateOptionsMenu();
         peakWebView.loadUrl(urlToLoad);
+    }
 
+    @Override
+    public void onOmGeoDialogResult(City city) {
+        loadLocation(city);
     }
 
     private void updateCompass(SensorEvent event) {
@@ -519,6 +514,72 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
     }
     public void showGithub(View view) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/woheller69/PeakOrama")));
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent != null) {
+            String action = intent.getAction();
+            String type = intent.getType();
+            Log.d("Intent", intent.getAction() + " " + intent.getType());
+
+            // Check if intent contains location data
+            if (Intent.ACTION_SEND.equals(action) && type != null) {
+                // Handle send intent with location data
+                if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+                    String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+                    if (text != null) {
+                        text = text.replaceAll("\\s+","");
+                        Log.d("Text", text);
+                        City city = parseCoordinatesFromText(text);
+                        if (city != null) loadLocation(city);
+                    }
+                }
+            }
+        }
+    }
+
+    private City parseCoordinatesFromText(String text) {
+        // Try to find lat/lon pattern in text
+        // Pattern matching for common formats
+        String latLonPattern = "[-+]?[0-9]*\\.?[0-9]+,[-+]?[0-9]*\\.?[0-9]+";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(latLonPattern);
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            String coordinates = matcher.group();
+            String[] parts = coordinates.split(",");
+            if (parts.length == 2) {
+                try {
+                    double lat = Double.parseDouble(parts[0].trim());
+                    double lon = Double.parseDouble(parts[1].trim());
+                    City city = new City();
+                    city.setLatitude((float) lat);
+                    city.setLongitude((float) lon);
+                    return city;
+                } catch (NumberFormatException e) {
+                    // Handle parsing error
+                }
+            }
+        }
+
+        // Try more complex patterns like "lat=40.7128&lon=-74.0060"
+        java.util.regex.Pattern latLonPattern2 =
+                java.util.regex.Pattern.compile("lat=([-+]?[0-9]*\\.?[0-9]+).*?lon=([-+]?[0-9]*\\.?[0-9]+)");
+        java.util.regex.Matcher matcher2 = latLonPattern2.matcher(text);
+
+        if (matcher2.find()) {
+            try {
+                double lat = Double.parseDouble(matcher2.group(1));
+                double lon = Double.parseDouble(matcher2.group(2));
+                City city = new City();
+                city.setLatitude((float) lat);
+                city.setLongitude((float) lon);
+                return city;
+            } catch (NumberFormatException e) {
+                // Handle parsing error
+            }
+        }
+        return null;
     }
 
 }
