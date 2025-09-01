@@ -50,6 +50,7 @@ import org.woheller69.PeakOrama.model.DisplayRotation;
 import org.woheller69.PeakOrama.model.RotationVector;
 import org.woheller69.PeakOrama.util.MathUtils;
 import org.woheller69.PeakOrama.util.ThemeUtil;
+import org.woheller69.freeDroidWarn.FreeDroidWarn;
 import org.woheller69.omgeodialog.City;
 import org.woheller69.omgeodialog.OmGeoDialog;
 
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
         mapsWebSettings.setAllowContentAccess(false);
         mapsWebSettings.setAllowFileAccess(false);
         mapsWebSettings.setDatabaseEnabled(false);
+        FreeDroidWarn.showWarningOnUpgrade(this, BuildConfig.VERSION_CODE);
         if (GithubStar.shouldShowStarDialog(this)) GithubStar.starDialog(this,"https://github.com/woheller69/PeakOrama");
         handleIntent(getIntent());
     }

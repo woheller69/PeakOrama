@@ -11,8 +11,8 @@ android {
         applicationId "org.woheller69.PeakOrama"
         minSdk 26
         targetSdk 35
-        versionCode 34
-        versionName "3.4"
+        versionCode 35
+        versionName "3.5"
     }
 
     buildTypes {
@@ -32,4 +32,5 @@ dependencies {
     //implementation project(path: ':library')
 
     implementation 'com.github.woheller69:OmGeoDialog:V1.5'
+    implementation 'com.github.woheller69:FreeDroidWarn:V1.2'
 }
