@@ -32,5 +32,5 @@ dependencies {
     //implementation project(path: ':library')
 
     implementation 'com.github.woheller69:OmGeoDialog:V1.5'
-    implementation 'com.github.woheller69:FreeDroidWarn:V1.2'
+    implementation 'com.github.woheller69:FreeDroidWarn:V1.3'
 }
