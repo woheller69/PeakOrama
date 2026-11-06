@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements OmGeoDialog.OmGeo
         allowedDomains.add("cloud*.peakfinder.com");
         allowedDomains.add("www.peakfinder.com");
         allowedDomains.add("service.peakfinder.com");
+        allowedDomains.add("wasm.peakfinder.com");
         allowedDomains.add("kxcdn.com");  //without some info is missing in the info window at the bottom. But not sure if kxcdn.com should be trusted
     }
 
